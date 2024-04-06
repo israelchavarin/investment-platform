@@ -7,9 +7,7 @@ import generateToken from '../helpers/jwt.js';
 
 /** Register function
  * Input: givenName, familyName, email, password, balance
- * Output:
- *  when sucessful: { status, message, data: { token, refreshToken } }
- *  when error: { status, error }
+ * Data output: token, refreshToken
  */
 export const register = async (req, res) => {
   const t = await sequelize.transaction();
@@ -80,8 +78,46 @@ export const register = async (req, res) => {
 
 /** Login function
  * Input: email, password
- * Output: We'll see about that
+ * Data output: token, refreshToken
  */
-export const login = (_, res) => {
-  res.status(200).json({ status: 'logged in', message: 'testing' });
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // User search by email
+    const userAccess = await UserAccess.findOne({
+      where: { email },
+      attributes: ['user_id', 'email', 'password'],
+    });
+
+    if (!userAccess) return res.status(400).json({ status: 400, error: 'User not found' });
+
+    // Password validation
+    const isMatch = await bcrypt.compare(password, userAccess.password);
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ status: 400, error: 'Invalid credentials' });
+    }
+
+    // Creation and return of tokens
+    const token = await generateToken(
+      { id: userAccess.user_id },
+      process.env.JWT_SECRET,
+      process.env.JWT_EXPIRATION,
+    );
+    const refreshToken = await generateToken(
+      { id: userAccess.user_id },
+      process.env.REFRESH_JWT_SECRET,
+      process.env.REFRESH_JWT_EXPIRATION,
+    );
+
+    return res.status(200).json({
+      status: 200,
+      data: { token, refreshToken },
+    });
+  } catch (error) {
+    return res.status(500).json({ status: 500, error: error.message });
+  }
 };
