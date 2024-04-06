@@ -1,13 +1,38 @@
 import express from 'express';
+import winston from 'winston';
+import mainRouter from './routes/main.router.js';
+import { sequelize } from './config/database.config.js';
 
 const app = express();
 const PORT = process.env.API_PORT || 3000;
 
-app.get('/', (_, res) => {
-  res.send('Starter project!');
+// logger to be used instead of directly the console for handling
+// console statements in a more controlled and professional manner
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console(),
+  ],
 });
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is listening on port ${PORT}`);
-});
+// middlewares
+app.use(express.json());
+
+// router
+mainRouter(app);
+
+async function main() {
+  try {
+    // synchronize models with the database
+    await sequelize.sync();
+
+    const port = 3000;
+    app.listen(port);
+    logger.info(`Server listening on port: ${PORT}`);
+  } catch (error) {
+    logger.info('Unable to connect to the database:', error);
+  }
+}
+
+main();
