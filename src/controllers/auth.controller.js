@@ -74,7 +74,10 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     await t.rollback();
-    return res.status(500).json({ status: 500, error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
@@ -123,6 +126,9 @@ export const login = async (req, res) => {
       data: { accessToken, refreshToken },
     });
   } catch (error) {
-    return res.status(500).json({ status: 500, error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };

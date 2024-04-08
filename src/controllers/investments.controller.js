@@ -126,14 +126,30 @@ export const invest = async (req, res) => {
       throw error;
     }
   } catch (error) {
-    return res.status(500).json({ status: 500, error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
-/** Withdraw investment function
- * Input: givenName, familyName, email, password, balance
- * Data output: accessToken, refreshToken
+/** List investments function
+ * Input: none
+ * Data output: [investments]
  */
-export const withdraw = async (req, res) => {
-  res.send('withdrawing');
+export const listInvestments = async (req, res) => {
+  try {
+    const investments = await Investment.findAll(
+      { where: { user_id: req.user.id } },
+    );
+    return res.status(200).json({
+      status: 200,
+      data: { investments },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
 };

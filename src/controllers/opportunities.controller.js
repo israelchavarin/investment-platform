@@ -36,7 +36,10 @@ export const createOpportunity = async (req, res) => {
       data: { newOpportunity },
     });
   } catch (error) {
-    return res.status(500).json({ status: 500, error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
@@ -45,11 +48,18 @@ export const createOpportunity = async (req, res) => {
  * Data output: [opportunities]
  */
 export const listAllOpportunities = async (_, res) => {
-  const opportunities = await Opportunity.findAll();
-  return res.status(200).json({
-    status: 200,
-    data: { opportunities },
-  });
+  try {
+    const opportunities = await Opportunity.findAll();
+    return res.status(200).json({
+      status: 200,
+      data: { opportunities },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
 };
 
 /** List active opportunities function
@@ -57,11 +67,18 @@ export const listAllOpportunities = async (_, res) => {
  * Data output: [opportunities]
  */
 export const listActiveOpportunities = async (_, res) => {
-  const opportunities = await Opportunity.findAll(
-    { where: { status: 'active' } },
-  );
-  return res.status(200).json({
-    status: 200,
-    data: { opportunities },
-  });
+  try {
+    const opportunities = await Opportunity.findAll(
+      { where: { status: 'active' } },
+    );
+    return res.status(200).json({
+      status: 200,
+      data: { opportunities },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
 };
