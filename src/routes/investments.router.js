@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { invest, listInvestments } from '../controllers/investments.controller.js';
+import { invest, listInvestments, withdraw } from '../controllers/investments.controller.js';
 import validateSchema from '../middlewares/validateSchema.middleware.js';
 import investmentSchema from './validations/investments.schema.js';
 import authenticate from '../middlewares/authenticate.middleware.js';
@@ -15,5 +15,10 @@ router.post('/invest', authenticate, validateSchema(investmentSchema), invest);
  *  /api/investments
  */
 router.get('/', authenticate, listInvestments);
+
+/** PATCH
+ *  /api/investments/withdraw/:id
+ */
+router.patch('/withdraw/:id', authenticate, withdraw);
 
 export default router;
