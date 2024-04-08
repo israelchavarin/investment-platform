@@ -19,9 +19,10 @@ export const register = async (req, res) => {
     } = req.body;
 
     // Email verification
-    const existingAccess = await UserAccess.findOne({ where: { email } });
+    const existingAccess = await UserAccess.findOne({ where: { email }, transaction: t });
 
-    if (existingAccess) {
+    if (existingAccess && !existingAccess.is_hidden) {
+      await t.rollback();
       return res.status(400).json({
         status: 400,
         error: 'Email provided already in use',
