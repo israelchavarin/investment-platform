@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createOpportunity, invest } from '../controllers/opportunities.controller.js';
+import { createOpportunity, listAllOpportunities, listActiveOpportunities } from '../controllers/opportunities.controller.js';
 import validateSchema from '../middlewares/validateSchema.middleware.js';
-import { opportunityCreationSchema, investmentSchema } from './validations/opportunities.schema.js';
+import opportunityCreationSchema from './validations/opportunities.schema.js';
 import authenticate from '../middlewares/authenticate.middleware.js';
 
 const router = Router();
@@ -11,9 +11,14 @@ const router = Router();
  */
 router.post('/create', validateSchema(opportunityCreationSchema), createOpportunity);
 
-/** POST
- *  /api/opportunities/invest
+/** GET
+ *  /api/opportunities/all
  */
-router.post('/invest', authenticate, validateSchema(investmentSchema), invest);
+router.get('/all', listAllOpportunities);
+
+/** GET
+ *  /api/opportunities/active
+ */
+router.get('/active', authenticate, listActiveOpportunities);
 
 export default router;

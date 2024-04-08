@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const opportunityCreationSchema = z.object({
+const opportunityCreationSchema = z.object({
   opportunityReference: z
     .string({
       required_error: 'Reference is required',
@@ -22,17 +22,4 @@ export const opportunityCreationSchema = z.object({
     }),
 });
 
-export const investmentSchema = z.object({
-  opportunityReference: z
-    .string({
-      required_error: 'Reference is required',
-    })
-    .trim(),
-  investmentAmount: z
-    .number({
-      required_error: 'Amount is required',
-    })
-    .refine((amount) => amount > 0, {
-      message: 'Amount must be greater than 0',
-    }),
-});
+export default opportunityCreationSchema;
