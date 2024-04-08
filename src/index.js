@@ -1,5 +1,6 @@
 import express from 'express';
 import winston from 'winston';
+import cookieParser from 'cookie-parser';
 import mainRouter from './routes/main.router.js';
 import { sequelize } from './config/database.config.js';
 
@@ -18,6 +19,7 @@ const logger = winston.createLogger({
 
 // middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 // router
 mainRouter(app);
@@ -25,7 +27,7 @@ mainRouter(app);
 async function main() {
   try {
     // synchronize models with the database
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
 
     const port = 3000;
     app.listen(port);

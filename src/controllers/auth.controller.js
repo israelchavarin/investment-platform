@@ -7,7 +7,7 @@ import generateToken from '../helpers/jwt.js';
 
 /** Register function
  * Input: givenName, familyName, email, password, balance
- * Data output: token, refreshToken
+ * Data output: accessToken, refreshToken
  */
 export const register = async (req, res) => {
   const t = await sequelize.transaction();
@@ -54,7 +54,7 @@ export const register = async (req, res) => {
     await t.commit();
 
     // Creation and return of tokens
-    const token = await generateToken(
+    const accessToken = await generateToken(
       { id: userId },
       process.env.JWT_SECRET,
       process.env.JWT_EXPIRATION,
@@ -65,10 +65,12 @@ export const register = async (req, res) => {
       process.env.REFRESH_JWT_EXPIRATION,
     );
 
+    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'strict' });
+
     return res.status(201).json({
       status: 201,
       message: 'User created successfully',
-      data: { token, refreshToken },
+      data: { accessToken, refreshToken },
     });
   } catch (error) {
     await t.rollback();
@@ -81,6 +83,7 @@ export const register = async (req, res) => {
  * Data output: token, refreshToken
  */
 export const login = async (req, res) => {
+  // Data gathering
   const { email, password } = req.body;
 
   try {
@@ -102,7 +105,7 @@ export const login = async (req, res) => {
     }
 
     // Creation and return of tokens
-    const token = await generateToken(
+    const accessToken = await generateToken(
       { id: userAccess.user_id },
       process.env.JWT_SECRET,
       process.env.JWT_EXPIRATION,
@@ -113,9 +116,11 @@ export const login = async (req, res) => {
       process.env.REFRESH_JWT_EXPIRATION,
     );
 
+    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'strict' });
+
     return res.status(200).json({
       status: 200,
-      data: { token, refreshToken },
+      data: { accessToken, refreshToken },
     });
   } catch (error) {
     return res.status(500).json({ status: 500, error: error.message });
