@@ -28,6 +28,11 @@ const Opportunity = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    is_hidden: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   {
     timestamps: true,

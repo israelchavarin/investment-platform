@@ -17,6 +17,11 @@ const UserBalance = sequelize.define(
     used_balance: {
       type: DataTypes.DECIMAL(9, 2),
     },
+    is_hidden: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   {
     timestamps: true,
