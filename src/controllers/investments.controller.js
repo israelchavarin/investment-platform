@@ -159,9 +159,14 @@ export const withdraw = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const investment = await Investment.findByPk(id);
+    const investment = await Investment.findByPk(id, { transaction: t });
+    const opportunity = await Opportunity.findOne({
+      where: { opportunity_reference: investment.opportunity_reference },
+      transaction: t,
+    });
 
-    if (!investment || investment.is_hidden) {
+    if (!investment || investment.is_hidden || !opportunity || opportunity.is_hidden || opportunity.status === 'completed') {
+      await t.rollback();
       return res.status(400).json({
         status: 400,
         error: 'Investment not available for withdrawal',
