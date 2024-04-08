@@ -93,7 +93,7 @@ export const login = async (req, res) => {
   try {
     // User search by email
     const userAccess = await UserAccess.findOne({
-      where: { email },
+      where: { email, is_hidden: false },
       attributes: ['user_id', 'email', 'password'],
     });
 
