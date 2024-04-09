@@ -13,7 +13,7 @@ export const createOpportunity = async (req, res) => {
 
     // Reference verification
     const existingReference = await Opportunity.findOne(
-      { where: { opportunity_reference: opportunityReference } },
+      { where: { opportunity_reference: opportunityReference, is_hidden: false } },
     );
 
     if (existingReference) {
@@ -49,7 +49,7 @@ export const createOpportunity = async (req, res) => {
  */
 export const listAllOpportunities = async (_, res) => {
   try {
-    const opportunities = await Opportunity.findAll();
+    const opportunities = await Opportunity.findAll({ where: { is_hidden: false } });
     return res.status(200).json({
       status: 200,
       data: { opportunities },
@@ -69,7 +69,7 @@ export const listAllOpportunities = async (_, res) => {
 export const listActiveOpportunities = async (_, res) => {
   try {
     const opportunities = await Opportunity.findAll(
-      { where: { status: 'active' } },
+      { where: { status: 'active', is_hidden: false } },
     );
     return res.status(200).json({
       status: 200,

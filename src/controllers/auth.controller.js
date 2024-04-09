@@ -19,9 +19,12 @@ export const register = async (req, res) => {
     } = req.body;
 
     // Email verification
-    const existingAccess = await UserAccess.findOne({ where: { email }, transaction: t });
+    const existingAccess = await UserAccess.findOne({
+      where: { email, is_hidden: false },
+      transaction: t,
+    });
 
-    if (existingAccess && !existingAccess.is_hidden) {
+    if (existingAccess) {
       await t.rollback();
       return res.status(400).json({
         status: 400,

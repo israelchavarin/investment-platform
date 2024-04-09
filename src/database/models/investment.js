@@ -16,6 +16,10 @@ const Investment = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    opportunity_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     opportunity_reference: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -38,7 +42,7 @@ const Investment = sequelize.define(
 Investment.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Investment, { foreignKey: 'user_id' });
 
-Investment.belongsTo(Opportunity, { foreignKey: 'opportunity_reference' });
-Opportunity.hasMany(Investment, { foreignKey: 'opportunity_reference' });
+Investment.belongsTo(Opportunity, { foreignKey: 'opportunity_id' });
+Opportunity.hasMany(Investment, { foreignKey: 'opportunity_id' });
 
 export default Investment;

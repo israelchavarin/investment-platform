@@ -16,11 +16,12 @@ export const invest = async (req, res) => {
     const {
       opportunityReference, investmentAmount,
     } = req.body;
+    const { id } = req.user;
     const investmentCurrency = currency(investmentAmount);
 
     // Find the opportunity
     const opportunity = await Opportunity.findOne({
-      where: { opportunity_reference: opportunityReference },
+      where: { opportunity_reference: opportunityReference, is_hidden: false },
       transaction: t,
     });
 
@@ -42,7 +43,9 @@ export const invest = async (req, res) => {
     }
 
     // Balance validations
-    const userBalance = await UserBalance.findByPk(req.user.id);
+    const userBalance = await UserBalance.findOne({
+      where: { user_id: id, is_hidden: false },
+    });
 
     if (!userBalance) {
       await t.rollback();
@@ -79,6 +82,7 @@ export const invest = async (req, res) => {
     // Create new investment
     const newInvestment = await Investment.create({
       user_id: req.user.id,
+      opportunity_id: opportunity.opportunity_id,
       opportunity_reference: opportunityReference,
       investment_amount: investmentAmount,
     }, { transaction: t });
@@ -135,7 +139,7 @@ export const listInvestments = async (req, res) => {
   try {
     const { id } = req.user;
     const investments = await Investment.findAll(
-      { where: { user_id: id } },
+      { where: { user_id: id, is_hidden: false } },
     );
 
     return res.status(200).json({
@@ -159,13 +163,20 @@ export const withdraw = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const investment = await Investment.findByPk(id, { transaction: t });
+    const { id: userId } = req.user;
+    const investment = await Investment.findOne({
+      where: { investment_id: id, is_hidden: false },
+      transaction: t,
+    });
     const opportunity = await Opportunity.findOne({
-      where: { opportunity_reference: investment.opportunity_reference },
+      where: {
+        opportunity_reference: investment.opportunity_reference,
+        is_hidden: false,
+      },
       transaction: t,
     });
 
-    if (!investment || investment.is_hidden || !opportunity || opportunity.is_hidden || opportunity.status === 'completed') {
+    if (!investment || !opportunity || opportunity.status === 'completed') {
       await t.rollback();
       return res.status(400).json({
         status: 400,
@@ -179,7 +190,17 @@ export const withdraw = async (req, res) => {
 
     // Update balances of user
     const investmentCurrency = currency(investment.investment_amount);
-    const userBalance = await UserBalance.findByPk(req.user.id);
+    const userBalance = await UserBalance.findOne({
+      where: { user_id: userId, is_hidden: false },
+    });
+
+    if (!userBalance) {
+      await t.rollback();
+      return res.status(400).json({
+        status: 400,
+        error: 'User could not be identified',
+      });
+    }
 
     userBalance.balance = currency(
       userBalance.balance,

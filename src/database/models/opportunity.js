@@ -4,11 +4,15 @@ import { sequelize } from '../../config/database.config.js';
 const Opportunity = sequelize.define(
   'opportunity',
   {
-    opportunity_reference: {
-      type: DataTypes.TEXT,
+    opportunity_id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       allowNull: false,
-      unique: true,
+    },
+    opportunity_reference: {
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     investment_goal: {
       type: DataTypes.INTEGER,
