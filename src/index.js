@@ -27,7 +27,7 @@ mainRouter(app);
 async function main() {
   try {
     // synchronize models with the database
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
 
     const port = 3000;
     app.listen(port);
