@@ -29,8 +29,7 @@ async function main() {
     // synchronize models with the database
     await sequelize.sync();
 
-    const port = 3000;
-    app.listen(port);
+    app.listen(PORT);
     logger.info(`Server listening on port: ${PORT}`);
   } catch (error) {
     logger.info('Unable to connect to the database:', error);
